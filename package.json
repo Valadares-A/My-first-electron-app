@@ -1,0 +1,23 @@
+{
+  "name": "my-first-electron-app",
+  "version": "1.0.0",
+  "description": "My frist electron app",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Valadares-A/My-first-electron-app.git"
+  },
+  "author": "Valadares-A",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Valadares-A/My-first-electron-app/issues"
+  },
+  "homepage": "https://github.com/Valadares-A/My-first-electron-app#readme",
+  "devDependencies": {
+    "electron": "^8.2.5"
+  }
+}

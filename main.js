@@ -4,17 +4,27 @@ const {
   Notification,
   Menu,
   Tray,
-  webContents,
   ipcMain,
+  dialog,
 } = require("electron");
+const Store = require("./Store");
+const store = new Store({
+  // We'll call our data file 'user-preferences'
+  configName: "user-preferences",
+  defaults: {
+    // 800x600 is the default size of our window
+    windowBounds: { width: 800, height: 600 },
+    pages: {},
+  },
+});
 
 let myNotification;
-// let notButton;
 let tray = null;
+let win;
 
 function createWindow() {
   // Cria uma janela de navegação.
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -26,8 +36,8 @@ function createWindow() {
   win.loadFile("index.html");
 
   // Open the DevTools.
-  win.webContents.openDevTools();
-//   console.log(win.webContents);
+  // win.webContents.openDevTools();
+  //   console.log(win.webContents);
 }
 
 // This method will be called when Electron has finished
@@ -45,17 +55,29 @@ app.on("window-all-closed", () => {
 });
 
 app.on("ready", (event) => {
-    tray = new Tray("icon2.png");
-    const contextMenu = Menu.buildFromTemplate([
-      { label: "Item1", type: "radio" },
-      { label: "Item2", type: "radio" },
-      { label: "Item3", type: "radio", checked: true },
-      { label: "Item4", type: "radio" },
-    ]);
-    tray.setContextMenu(contextMenu);
-    contextMenu.items[1].checked = false;
-    tray.setToolTip("This is my application.");
-    tray.setContextMenu(contextMenu);
+  tray = new Tray("icon2.png");
+  const contextMenu = Menu.buildFromTemplate([
+    { label: "Item1", type: "radio" },
+    { label: "Item2", type: "radio" },
+    { label: "Item3", type: "radio", checked: true },
+    { label: "Item4", type: "radio" },
+  ]);
+  tray.setContextMenu(contextMenu);
+  contextMenu.items[1].checked = false;
+  tray.setToolTip("This is my application.");
+  tray.setContextMenu(contextMenu);
+  console.log("path: ", app.getAppPath());
+  console.log(store.get("windowBounds"));
+
+  // console.log(win.getBounds());
+
+  // win.on('resize', (event) => {
+  //   // The event doesn't pass us the window size, so we call the `getBounds` method which returns an object with
+  //   // the height, width, and x and y coordinates.
+  //   let { width, height } = win.getBounds();
+  //   // Now that we have them, save them using the `set` method.
+  //   store.set('windowBounds', { width, height });
+  // });
 });
 
 app.on("activate", () => {
@@ -82,11 +104,33 @@ ipcMain
       body: data,
     });
     myNotification.show();
-    // myNotification.on("click", (ev)=>{
-    //     console.log(ev);
-
-    // })
     myNotification.on("close", (ev) => {
       console.log(ev);
     });
+  })
+  .on("chooseFolder", (event, data) => {
+    dialog
+      .showOpenDialog({
+        title: "Selecione uma pasta",
+        properties: ["openDirectory", "createDirectory"],
+      })
+      .then((res) => {
+        console.log(res);
+        win.webContents.send("folder-info", res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  })
+  .on("resize-window", (even, data) => {
+    console.log("mudand a conf da tela");
+    console.log(data);
+    let width = data.width;
+    let height = data.height;
+    store.set("windowBounds", { width, height });
+  })
+  .on("download-photos", (event, data) => {
+    let aux = {};
+    aux[data.name] = data;
+    store.set("pages", aux);
   });

@@ -8,8 +8,12 @@
       http-equiv="Content-Security-Policy"
       content="script-src 'self' 'unsafe-inline';"
     />
-    <!-- <script src="main.js"></script> -->
-    <!-- <script src="back.js"></script> -->
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
   </head>
   <body>
     <h1>Hello World!</h1>
@@ -27,24 +31,70 @@
     </script>
     .
     <button id="notBtn">show notificatio</button>
-    <input type="text" id="inp">
+    <input type="text" id="inp" />
+    <div class="alert alert-primary" role="alert">
+      Selecione uma pasta
+    </div>
+    <div class="container">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <button class="btn btn-outline-secondary" type="button" id="folder">
+            Folder
+          </button>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          placeholder=""
+          aria-label=""
+          aria-describedby="basic-addon1"
+          id="iptFolder"
+        />
+      </div>
+
+      <div class="row">
+        <div class="col-sm">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Links</span>
+            </div>
+            <textarea
+              class="form-control"
+              aria-label="With textarea"
+              id="links"
+            ></textarea>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-success" type="button" onclick="download()">
+            Download
+          </button>
+        </div>
+      </div>
+      <br />
+      <div>
+        <button
+          class="btn btn-danger"
+          type="button"
+          onclick="changeDefaultSize()"
+        >
+          Change Size window
+        </button>
+      </div>
+      <br />
+      <div class="progress">
+        <div
+          class="progress-bar progress-bar-striped bg-success"
+          role="progressbar"
+          style="width: 25%;"
+          aria-valuenow="25"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          25%
+        </div>
+      </div>
+    </div>
+    <script src="back.js"></script>
   </body>
-  <script>
-    const { ipcRenderer } = require("electron");
-    let btn = document.getElementById("notBtn");
-    let inp = document.getElementById("inp");
-    let mensage = "";
-
-    inp.addEventListener("keydown", (event)=>{
-        console.log(event.target.value);        
-        mensage = event.target.value;
-    });
-
-    btn.addEventListener("click", (event) => {
-      console.log(event);
-      ipcRenderer.send("x", { name: "x", value: event.x });
-      ipcRenderer.send("y", { name: "y", value: event.y });
-      ipcRenderer.send("notify", mensage);
-    });
-  </script>
 </html>

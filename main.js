@@ -17,7 +17,19 @@ const store = new Store({
     pages: {},
   },
 });
+const saver = require("instagram-save");
+// const linkSet = require("./links");
+const Instagram = require("instagram-nodejs-without-api");
+const inst = new Instagram();
+// ######### Insta
+let auxstr = "";
+let idx = 0;
+let timeout = 30000;
+let total = 0;
+let paused = false;
+let folder = "";
 
+// ######### System
 let myNotification;
 let tray = null;
 let win;
@@ -69,15 +81,20 @@ app.on("ready", (event) => {
   console.log("path: ", app.getAppPath());
   console.log(store.get("windowBounds"));
 
-  // console.log(win.getBounds());
-
-  // win.on('resize', (event) => {
-  //   // The event doesn't pass us the window size, so we call the `getBounds` method which returns an object with
-  //   // the height, width, and x and y coordinates.
-  //   let { width, height } = win.getBounds();
-  //   // Now that we have them, save them using the `set` method.
-  //   store.set('windowBounds', { width, height });
-  // });
+  // inst
+  //   .getCsrfToken()
+  //   .then((csrf) => {
+  //     inst.csrfToken = csrf;
+  //   })
+  //   .then(() => {
+  //     inst.auth("eduardoyang147", "#huehueC4").then((sessionId) => {
+  //       console.log("sessionid:", sessionId);
+  //       inst.sessionId = sessionId;
+  //       console.log(idx);
+  //       downloadImg(auxstr[idx]);
+  //     });
+  //   })
+  //   .catch(console.error);
 });
 
 app.on("activate", () => {
@@ -107,6 +124,9 @@ ipcMain
     myNotification.on("close", (ev) => {
       console.log(ev);
     });
+    console.log("sending log in event");
+
+    win.webContents.send("login", { status: "ok" });
   })
   .on("chooseFolder", (event, data) => {
     dialog
@@ -130,7 +150,91 @@ ipcMain
     store.set("windowBounds", { width, height });
   })
   .on("download-photos", (event, data) => {
+    console.log("download event started");
+    
     let aux = {};
+    let aux2 = store.get("pages") ? store.get("pages"): {};
     aux[data.name] = data;
-    store.set("pages", aux);
+    store.set("pages", { ...aux2, ...aux });
+
+    auxstr = data.links.split("\n");
+    total = auxstr.length;
+    console.log(auxstr.length);
+    inst
+      .getCsrfToken()
+      .then((csrf) => {
+        inst.csrfToken = csrf;
+      })
+      .then(() => {
+        inst.auth("eduardoyang147", "#huehueC4").then((sessionId) => {
+          console.log("sessionid:", sessionId);
+          inst.sessionId = sessionId;
+          idx = data.index;
+          console.log(idx);
+          win.webContents.send("update-percent", calculatePercent(idx, total));
+          downloadImg(auxstr[idx], data.path);
+        });
+      })
+      .catch(console.error);
+  }).on("pause",(event, data)=>{
+    paused = true;
+    let aux = {};
+    let aux2 = store.get("pages") ? store.get("pages"): {};
+    aux[data.name] = data;
+    aux[data.name].index = idx;
+    store.set("pages", { ...aux2, ...aux });
+  }).on("continue",(event, data)=>{
+    paused = false;
+    downloadImg(auxstr[idx], folder);
   });
+
+function downloadImg(link, folderPath) {
+  if (paused === false) {
+    try {
+      saver(link, folderPath).then(
+        (res) => {
+          console.log(res.url);
+          inst.getMediaIdByUrl(res.url).then((res) => {
+            console.log("imgId: ", res);
+            inst.like(res).then((d) => {
+              console.log("status: ", d);
+            });
+          });
+          idx++;
+          win.webContents.send("update-percent", calculatePercent(idx, total));
+          console.log(idx);
+          if (idx <= auxstr.length - 1) {
+            setTimeout(() => {
+              downloadImg(auxstr[idx], folderPath);
+            }, timeout);
+          }
+        },
+        (err) => {
+          console.log(err);
+          idx++;
+          win.webContents.send("update-percent", calculatePercent(idx, total));
+          console.log(idx);
+          if (idx <= auxstr.length - 1) {
+            setTimeout(() => {
+              downloadImg(auxstr[idx], folderPath);
+            }, timeout);
+          }
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      idx++;
+      win.webContents.send("update-percent", calculatePercent(idx, total));
+      console.log(idx);
+      if (idx <= auxstr.length - 1) {
+        setTimeout(() => {
+          downloadImg(auxstr[idx], folderPath);
+        }, timeout);
+      }
+    }
+  }
+}
+
+function calculatePercent(idx, total) {
+  return { idx: idx, total: total, percentage: (idx * 100) / total };
+}

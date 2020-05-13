@@ -35,6 +35,12 @@ ipcRenderer.on("folder-info", (event, data) => {
     // inputfolder.value = folderName;
     inputfolder.focus();
   }
+}).on("login",(event,data)=>{
+  $('.toast').toast('show');
+}).on("update-percent", (event,data)=>{
+  $("#download-bar").attr("aria-valuenow", `${data.percentage}`);
+  $("#download-bar").css("width", `${data.percentage}%`);
+  $("#toshow").attr("value",data.idx);
 });
 
 function changeDefaultSize() {
@@ -48,4 +54,27 @@ function download() {
     links: links.value,
     index: 0,
   });
+  $("#download").attr("disabled","true");
+  $("#pause").removeAttr("disabled");
+}
+
+function onPause() {
+  ipcRenderer.send("pause", {
+    name: folderName,
+    path: folderPath,
+    links: links.value,
+    index: 0,
+  });
+  $("#pause").attr("disabled","true");
+}
+
+function onContinue() {
+  ipcRenderer.send("continue", {
+    name: folderName,
+    path: folderPath,
+    links: links.value,
+    index: 0,
+  });
+  $("#pause").removeAttr("disabled");
+  $("#continue").attr("disabled","true");
 }

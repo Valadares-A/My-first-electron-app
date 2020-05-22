@@ -65,7 +65,12 @@
           </div>
         </div>
         <div class="col-sm-2">
-          <button class="btn btn-success" type="button" onclick="download()" id="download">
+          <button
+            class="btn btn-success"
+            type="button"
+            onclick="download()"
+            id="download"
+          >
             Download
           </button>
         </div>
@@ -73,13 +78,27 @@
       <br />
       <div class="row">
         <div class="col">
-          <button class="btn btn-primary" onclick="onPause()" id="pause" disabled>Pause</button>
+          <button
+            class="btn btn-primary"
+            onclick="onPause()"
+            id="pause"
+            disabled
+          >
+            Pause
+          </button>
         </div>
         <div class="col">
-          <button class="btn btn-success" onclick="onContinue()" id="continue" disabled>Continue</button>
+          <button
+            class="btn btn-success"
+            onclick="onContinue()"
+            id="continue"
+            disabled
+          >
+            Continue
+          </button>
         </div>
       </div>
-      <br>
+      <br />
       <div>
         <button
           class="btn btn-danger"
@@ -104,9 +123,18 @@
         </div>
       </div>
       <div>
-        <input type="text" value="0" disabled id="toshow">
+        <input type="text" value="0" disabled id="toshow" />
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <button onclick="enable2Disable1()" disabled id="t1">Teste 1</button>
+        </div>
+        <div class="col-sm">
+          <button onclick="enable1Disable2()" id="t2">Teste 2</button>
+        </div>
       </div>
     </div>
+    <!-- não funfa não sei porq -->
     <div id="toast-tester" class="toast" role="alert">
       <div class="toast-header">
         <img src="..." class="rounded mr-2" alt="..." />
@@ -126,9 +154,23 @@
       </div>
     </div>
     <!-- scripts -->
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="node_modules/popper.js/dist/popper.min.js"></script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="back.js"></script>
+    <!-- <script>
+      let $ = require("jquery");
+    </script>
+    <script>
+      require("popper.js");
+    </script>
+    <script>
+      require("bootstrap");
+    </script> -->
+    <!-- <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script> -->
+    <!-- <script src="node_modules/jquery/src/jquery.js"></script> -->
+    <script type="text/javascript" src="back.js"></script>
+    <!-- <script src="node_modules/popper.js/dist/popper.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script> -->
+    <!-- <script src="libs/jquery.js"></script> -->
+    <!-- <script src="libs/popper.js"></script>
+    <script src="libs/bootstrap.js"></script> -->
+    <!-- <script src="back.js"></script> -->
   </body>
 </html>

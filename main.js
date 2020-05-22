@@ -7,6 +7,7 @@ const {
   ipcMain,
   dialog,
 } = require("electron");
+import { credentials } from "./credentials";
 const Store = require("./Store");
 const store = new Store({
   // We'll call our data file 'user-preferences'
@@ -48,7 +49,8 @@ function createWindow() {
   win.loadFile("index.html");
 
   // Open the DevTools.
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
+  // win.webContents.executeJavaScript()
   //   console.log(win.webContents);
 }
 
@@ -166,7 +168,7 @@ ipcMain
         inst.csrfToken = csrf;
       })
       .then(() => {
-        inst.auth("eduardoyang147", "#huehueC4").then((sessionId) => {
+        inst.auth(credentials.userName, credentials.password).then((sessionId) => {
           console.log("sessionid:", sessionId);
           inst.sessionId = sessionId;
           idx = data.index;

@@ -1,9 +1,22 @@
 const { ipcRenderer } = require("electron");
-let btn = document.getElementById("notBtn");
-let inp = document.getElementById("inp");
-let folder = document.getElementById("folder");
-let inputfolder = document.getElementById("iptFolder");
-let links = document.getElementById("links");
+// por algum motivo os import que seriam feitos na view dos javascript das libs tem que ser feitos aqui
+const $ = require('jquery');
+const popper = require('popper.js');
+const bootstrap = require('bootstrap');
+// 
+const btn = document.getElementById("notBtn");
+const inp = document.getElementById("inp");
+const folder = document.getElementById("folder");
+const inputfolder = document.getElementById("iptFolder");
+const links = document.getElementById("links");
+const downloadBtn = document.getElementById("download");
+const pauseBtn = document.getElementById("pause");
+const continueBtn = document.getElementById("continue");
+const btnTeste1 = document.getElementById("t1");
+const btnTeste2 = document.getElementById("t2");
+
+
+
 let mensage = "";
 let folderName = "";
 let folderPath = "";
@@ -54,8 +67,8 @@ function download() {
     links: links.value,
     index: 0,
   });
-  $("#download").attr("disabled","true");
-  $("#pause").removeAttr("disabled");
+  downloadBtn.setAttribute("disabled","true")
+  pauseBtn.removeAttribute("disabled");
 }
 
 function onPause() {
@@ -65,7 +78,7 @@ function onPause() {
     links: links.value,
     index: 0,
   });
-  $("#pause").attr("disabled","true");
+  pauseBtn.setAttribute("disabled","true")
 }
 
 function onContinue() {
@@ -75,6 +88,16 @@ function onContinue() {
     links: links.value,
     index: 0,
   });
-  $("#pause").removeAttr("disabled");
-  $("#continue").attr("disabled","true");
+  pauseBtn.removeAttribute("disabled");
+  continueBtn.setAttribute("disabled","true");
+}
+
+function enable1Disable2() {
+  btnTeste1.removeAttribute("disabled");
+  btnTeste2.setAttribute("disabled","true")
+}
+
+function enable2Disable1() {
+  btnTeste1.setAttribute("disabled","true");
+  btnTeste2.removeAttribute("disabled");
 }

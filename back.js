@@ -3,7 +3,24 @@ const { ipcRenderer } = require("electron");
 const $ = require('jquery');
 const popper = require('popper.js');
 const bootstrap = require('bootstrap');
+// import * as $ from "jquery"; -> not work
+// import popper from "popper.js"; -> not work
+// import bootstrap from "bootstrap"; -> not work
 // 
+// import { credentials } from "./credentials"; -> not work
+const credentials = require('./credentials')
+const saver = require("instagram-save");
+const Instagram = require("instagram-nodejs-without-api");
+const inst = new Instagram();
+// ######### Insta
+let auxstr = "";
+let idx = 0;
+let timeout = 30000;
+let total = 0;
+let paused = false;
+// let folder = "";
+
+
 const btn = document.getElementById("notBtn");
 const inp = document.getElementById("inp");
 const folder = document.getElementById("folder");
@@ -101,3 +118,75 @@ function enable2Disable1() {
   btnTeste1.setAttribute("disabled","true");
   btnTeste2.removeAttribute("disabled");
 }
+
+// auxstr = data.links.split("\n");
+//     total = auxstr.length;
+//     console.log(auxstr.length);
+//     inst
+//       .getCsrfToken()
+//       .then((csrf) => {
+//         inst.csrfToken = csrf;
+//       })
+//       .then(() => {
+//         inst.auth(credentials.userName, credentials.password).then((sessionId) => {
+//           console.log("sessionid:", sessionId);
+//           inst.sessionId = sessionId;
+//           idx = data.index;
+//           console.log(idx);
+//           win.webContents.send("update-percent", calculatePercent(idx, total));
+//           downloadImg(auxstr[idx], data.path);
+//         });
+//       })
+//       .catch(console.error);
+
+
+      function downloadImg(link, folderPath) {
+        if (paused === false) {
+          try {
+            saver(link, folderPath).then(
+              (res) => {
+                console.log(res.url);
+                inst.getMediaIdByUrl(res.url).then((res) => {
+                  console.log("imgId: ", res);
+                  inst.like(res).then((d) => {
+                    console.log("status: ", d);
+                  });
+                });
+                idx++;
+                win.webContents.send("update-percent", calculatePercent(idx, total));
+                console.log(idx);
+                if (idx <= auxstr.length - 1) {
+                  setTimeout(() => {
+                    downloadImg(auxstr[idx], folderPath);
+                  }, timeout);
+                }
+              },
+              (err) => {
+                console.log(err);
+                idx++;
+                win.webContents.send("update-percent", calculatePercent(idx, total));
+                console.log(idx);
+                if (idx <= auxstr.length - 1) {
+                  setTimeout(() => {
+                    downloadImg(auxstr[idx], folderPath);
+                  }, timeout);
+                }
+              }
+            );
+          } catch (error) {
+            console.log(error);
+            idx++;
+            win.webContents.send("update-percent", calculatePercent(idx, total));
+            console.log(idx);
+            if (idx <= auxstr.length - 1) {
+              setTimeout(() => {
+                downloadImg(auxstr[idx], folderPath);
+              }, timeout);
+            }
+          }
+        }
+      }
+
+      function calculatePercent(idx, total) {
+        return { idx: idx, total: total, percentage: (idx * 100) / total };
+      }

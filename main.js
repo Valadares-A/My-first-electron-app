@@ -7,7 +7,6 @@ const {
   ipcMain,
   dialog,
 } = require("electron");
-import { credentials } from "./credentials";
 const Store = require("./Store");
 const store = new Store({
   // We'll call our data file 'user-preferences'
@@ -18,17 +17,6 @@ const store = new Store({
     pages: {},
   },
 });
-const saver = require("instagram-save");
-// const linkSet = require("./links");
-const Instagram = require("instagram-nodejs-without-api");
-const inst = new Instagram();
-// ######### Insta
-let auxstr = "";
-let idx = 0;
-let timeout = 30000;
-let total = 0;
-let paused = false;
-let folder = "";
 
 // ######### System
 let myNotification;
@@ -158,26 +146,6 @@ ipcMain
     let aux2 = store.get("pages") ? store.get("pages"): {};
     aux[data.name] = data;
     store.set("pages", { ...aux2, ...aux });
-
-    auxstr = data.links.split("\n");
-    total = auxstr.length;
-    console.log(auxstr.length);
-    inst
-      .getCsrfToken()
-      .then((csrf) => {
-        inst.csrfToken = csrf;
-      })
-      .then(() => {
-        inst.auth(credentials.userName, credentials.password).then((sessionId) => {
-          console.log("sessionid:", sessionId);
-          inst.sessionId = sessionId;
-          idx = data.index;
-          console.log(idx);
-          win.webContents.send("update-percent", calculatePercent(idx, total));
-          downloadImg(auxstr[idx], data.path);
-        });
-      })
-      .catch(console.error);
   }).on("pause",(event, data)=>{
     paused = true;
     let aux = {};
@@ -187,56 +155,5 @@ ipcMain
     store.set("pages", { ...aux2, ...aux });
   }).on("continue",(event, data)=>{
     paused = false;
-    downloadImg(auxstr[idx], folder);
+    // downloadImg(auxstr[idx], folder);
   });
-
-function downloadImg(link, folderPath) {
-  if (paused === false) {
-    try {
-      saver(link, folderPath).then(
-        (res) => {
-          console.log(res.url);
-          inst.getMediaIdByUrl(res.url).then((res) => {
-            console.log("imgId: ", res);
-            inst.like(res).then((d) => {
-              console.log("status: ", d);
-            });
-          });
-          idx++;
-          win.webContents.send("update-percent", calculatePercent(idx, total));
-          console.log(idx);
-          if (idx <= auxstr.length - 1) {
-            setTimeout(() => {
-              downloadImg(auxstr[idx], folderPath);
-            }, timeout);
-          }
-        },
-        (err) => {
-          console.log(err);
-          idx++;
-          win.webContents.send("update-percent", calculatePercent(idx, total));
-          console.log(idx);
-          if (idx <= auxstr.length - 1) {
-            setTimeout(() => {
-              downloadImg(auxstr[idx], folderPath);
-            }, timeout);
-          }
-        }
-      );
-    } catch (error) {
-      console.log(error);
-      idx++;
-      win.webContents.send("update-percent", calculatePercent(idx, total));
-      console.log(idx);
-      if (idx <= auxstr.length - 1) {
-        setTimeout(() => {
-          downloadImg(auxstr[idx], folderPath);
-        }, timeout);
-      }
-    }
-  }
-}
-
-function calculatePercent(idx, total) {
-  return { idx: idx, total: total, percentage: (idx * 100) / total };
-}

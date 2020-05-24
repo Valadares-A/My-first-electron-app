@@ -30,10 +30,15 @@ const pauseBtn = document.getElementById("pause");
 const continueBtn = document.getElementById("continue");
 const btnTeste1 = document.getElementById("t1");
 const btnTeste2 = document.getElementById("t2");
+const userNameInpt = document.getElementById("userName");
+const passWordInpt = document.getElementById("passWord");
 
 let mensage = "";
 let folderName = "";
 let folderPath = "";
+
+userNameInpt.value = credentials.userName;
+passWordInpt.value = credentials.passWord;
 
 inp.addEventListener("keydown", (event) => {
   console.log(event.target.value);
@@ -80,26 +85,26 @@ function changeDefaultSize() {
 
 async function download() {
   try {
-    inst
-      .getCsrfToken()
-      .then((csrf) => {
-        inst.csrfToken = csrf;
-      })
-      .then(
-        () => {
-          inst
-            .auth(credentials.userName, credentials.password)
-            .then((sessionId) => {
-              console.log("sessionid:", sessionId);
-              inst.sessionId = sessionId;
-              // win.webContents.send("update-percent", calculatePercent(idx, total));
-              // downloadImg(auxstr[idx], data.path);
-            });
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
+    // inst
+    //   .getCsrfToken()
+    //   .then((csrf) => {
+    //     inst.csrfToken = csrf;
+    //   })
+    //   .then(
+    //     () => {
+    //       inst
+    //         .auth(credentials.userName, credentials.passWord)
+    //         .then((sessionId) => {
+    //           console.log("sessionid:", sessionId);
+    //           inst.sessionId = sessionId;
+    //           // win.webContents.send("update-percent", calculatePercent(idx, total));
+    //           // downloadImg(auxstr[idx], data.path);
+    //         });
+    //     },
+    //     (err) => {
+    //       console.log(err);
+    //     }
+    //   );
     // .catch(console.error);
 
     // ipcRenderer.send("download-photos", {
@@ -113,7 +118,7 @@ async function download() {
     console.log(listOflinks);
     console.log(folderName);
     console.log(folderPath);
-    console.log("estar promise");
+    console.log("start promise");
 
     for (let i = 0; i < listOflinks.length; i++) {
       idx = i;
@@ -125,7 +130,7 @@ async function download() {
           } else {
             reject({ status: "bad", link: listOflinks[i], index: i });
           }
-        }, 5000);
+        }, timeout);
       }).then(
         (res) => {
           console.log(res);
@@ -182,12 +187,12 @@ async function downloadImg(link, folderPath) {
   await saver(link, folderPath).then(
     (res) => {
       console.log(res.url);
-      inst.getMediaIdByUrl(res.url).then((res) => {
-        console.log("imgId: ", res);
-        inst.like(res).then((d) => {
-          console.log("status: ", d);
-        });
-      });
+      // inst.getMediaIdByUrl(res.url).then((res) => {
+      //   console.log("imgId: ", res);
+      //   inst.like(res).then((d) => {
+      //     console.log("status: ", d);
+      //   });
+      // });
       return true;
     },
     (err) => {
@@ -199,4 +204,41 @@ async function downloadImg(link, folderPath) {
 
 function calculatePercent(idx, total) {
   return { idx: idx, total: total, percentage: (idx * 100) / total };
+}
+
+async function logIn() {
+  console.log(userNameInpt.value);
+  console.log(passWordInpt.value);
+  try {
+    inst.getCsrfToken()
+      .then((csrf) => {
+        inst.csrfToken = csrf;
+      })
+      .then(() => {
+        return inst.auth(credentials.userName, credentials.passWord).then(
+          (sessionId) => {
+            console.log(sessionId);
+            
+            inst.sessionId = sessionId;
+
+            return inst.getUserDataByUsername("emily_knight.tv").then(
+              (t) => {
+                console.log(t);
+                
+                console.log(t.graphql);
+                
+                return inst.getUserFollowers(t.graphql.user.id).then(
+                  (t) => {
+                    console.log(t); // - inst followers for user "username-for-get"
+                  }
+                );
+              }
+            );
+          }
+        );
+      })
+      .catch(console.error);
+  } catch (error) {
+    console.log(error);
+  }
 }

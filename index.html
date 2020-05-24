@@ -133,8 +133,24 @@
           <button onclick="enable1Disable2()" id="t2">Teste 2</button>
         </div>
       </div>
+
+      <div class="row">
+        <div class="col-sm">
+          <label for="userName">User Name</label>
+          <input type="text" id="userName">
+        </div>
+        <div class="col-sm">
+          <label for="passWord">Password</label>
+          <input type="password" id="passWord">
+        </div>
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="logIn()" id="logIn">Login</button>
+        </div>
+      </div>
+
+
     </div>
-    <!-- não funfa não sei porq -->
+    
     <div id="toast-tester" class="toast" role="alert">
       <div class="toast-header">
         <img src="..." class="rounded mr-2" alt="..." />
@@ -153,24 +169,7 @@
         Hello, world! This is a toast message.
       </div>
     </div>
-    <!-- scripts -->
-    <!-- <script>
-      let $ = require("jquery");
-    </script>
-    <script>
-      require("popper.js");
-    </script>
-    <script>
-      require("bootstrap");
-    </script> -->
-    <!-- <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script> -->
-    <!-- <script src="node_modules/jquery/src/jquery.js"></script> -->
+    <!-- Scripts -->
     <script type="text/javascript" src="back.js"></script>
-    <!-- <script src="node_modules/popper.js/dist/popper.min.js"></script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script> -->
-    <!-- <script src="libs/jquery.js"></script> -->
-    <!-- <script src="libs/popper.js"></script>
-    <script src="libs/bootstrap.js"></script> -->
-    <!-- <script src="back.js"></script> -->
   </body>
 </html>

@@ -12,14 +12,6 @@ const credentials = require("./credentials");
 const saver = require("instagram-save");
 const Instagram = require("instagram-nodejs-without-api");
 const inst = new Instagram();
-// ######### Insta
-let auxstr = "";
-let idx = 0;
-let timeout = 30000;
-let total = 0;
-let paused = false;
-// let folder = "";
-
 const btn = document.getElementById("notBtn");
 const inp = document.getElementById("inp");
 const folder = document.getElementById("folder");
@@ -36,6 +28,11 @@ const passWordInpt = document.getElementById("passWord");
 let mensage = "";
 let folderName = "";
 let folderPath = "";
+let auxstr = "";
+let idx = 0;
+let timeout = 5000;
+let total = 0;
+let paused = false;
 
 userNameInpt.value = credentials.userName;
 passWordInpt.value = credentials.passWord;
@@ -114,63 +111,47 @@ async function download() {
     //   index: 0,
     // });
     // console.log(links.value);
-    let listOflinks = links.value.split("\n");
-    console.log(listOflinks);
+    console.log(links.value.split("\n"));
     console.log(folderName);
     console.log(folderPath);
     console.log("start promise");
 
-    for (let i = 0; i < listOflinks.length; i++) {
-      idx = i;
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          let itsOk = downloadImg(listOflinks[i], folderPath);
-          if (itsOk) {
-            resolve({ status: "ok", link: listOflinks[i], index: i });
-          } else {
-            reject({ status: "bad", link: listOflinks[i], index: i });
-          }
-        }, timeout);
-      }).then(
-        (res) => {
-          console.log(res);
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
-      // .catch((err) => {
-      //   console.log(err);
-      // });
-    }
-    console.log("end of promise");
+    downloadPromise(links.value.split("\n"));
 
-    // downloadBtn.setAttribute("disabled","true")
-    // pauseBtn.removeAttribute("disabled");
+    // console.log("end of promise");
+    downloadBtn.setAttribute("disabled", "true");
+    pauseBtn.removeAttribute("disabled");
   } catch (error) {
     console.log(error);
   }
 }
 
 function onPause() {
-  ipcRenderer.send("pause", {
-    name: folderName,
-    path: folderPath,
-    links: links.value,
-    index: 0,
-  });
+  // ipcRenderer.send("pause", {
+  //   name: folderName,
+  //   path: folderPath,
+  //   links: links.value,
+  //   index: 0,
+  // });
   pauseBtn.setAttribute("disabled", "true");
+  continueBtn.removeAttribute("disabled");
+  paused = true;
+  console.log("clicquei em pausar");
 }
 
 function onContinue() {
-  ipcRenderer.send("continue", {
-    name: folderName,
-    path: folderPath,
-    links: links.value,
-    index: 0,
-  });
+  // ipcRenderer.send("continue", {
+  //   name: folderName,
+  //   path: folderPath,
+  //   links: links.value,
+  //   index: 0,
+  // });
   pauseBtn.removeAttribute("disabled");
   continueBtn.setAttribute("disabled", "true");
+  paused = false;
+  console.log("cliquei em continuar");
+  console.log("download retomado");
+  downloadPromise(links.value.split("\n"));
 }
 
 function enable1Disable2() {
@@ -202,6 +183,35 @@ async function downloadImg(link, folderPath) {
   );
 }
 
+async function downloadPromise(list) {
+  for (let i = idx; i < list.length; i++) {
+    idx = i;
+    if (!paused) {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          let itsOk = downloadImg(list[i], folderPath);
+          if (itsOk) {
+            resolve({ status: "ok", link: list[i], index: i });
+          } else {
+            reject({ status: "bad", link: list[i], index: i });
+          }
+        }, timeout);
+      }).then(
+        (res) => {
+          console.log(res);
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    } else {
+      console.log("download pausado");
+
+      break;
+    }
+  }
+}
+
 function calculatePercent(idx, total) {
   return { idx: idx, total: total, percentage: (idx * 100) / total };
 }
@@ -210,32 +220,29 @@ async function logIn() {
   console.log(userNameInpt.value);
   console.log(passWordInpt.value);
   try {
-    inst.getCsrfToken()
+    inst
+      .getCsrfToken()
       .then((csrf) => {
         inst.csrfToken = csrf;
       })
       .then(() => {
-        return inst.auth(credentials.userName, credentials.passWord).then(
-          (sessionId) => {
+        return inst
+          .auth(credentials.userName, credentials.passWord)
+          .then((sessionId) => {
             console.log(sessionId);
-            
+
             inst.sessionId = sessionId;
 
-            return inst.getUserDataByUsername("emily_knight.tv").then(
-              (t) => {
-                console.log(t);
-                
-                console.log(t.graphql);
-                
-                return inst.getUserFollowers(t.graphql.user.id).then(
-                  (t) => {
-                    console.log(t); // - inst followers for user "username-for-get"
-                  }
-                );
-              }
-            );
-          }
-        );
+            return inst.getUserDataByUsername("emily_knight.tv").then((t) => {
+              console.log(t);
+
+              console.log(t.graphql);
+
+              return inst.getUserFollowers(t.graphql.user.id).then((t) => {
+                console.log(t); // - inst followers for user "username-for-get"
+              });
+            });
+          });
       })
       .catch(console.error);
   } catch (error) {

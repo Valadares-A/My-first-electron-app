@@ -76,42 +76,13 @@
         </div>
       </div>
       <br />
-      <div class="row">
-        <div class="col">
-          <button
-            class="btn btn-primary"
-            onclick="onPause()"
-            id="pause"
-            disabled
-          >
-            Pause
-          </button>
-        </div>
-        <div class="col">
-          <button
-            class="btn btn-success"
-            onclick="onContinue()"
-            id="continue"
-            disabled
-          >
-            Continue
-          </button>
-        </div>
+
+      <div class="d-flex flex-row-reverse bd-highlight">
+        <label id="label-progress" for="download-bar">0/0</label>
       </div>
-      <br />
-      <div>
-        <button
-          class="btn btn-danger"
-          type="button"
-          onclick="changeDefaultSize()"
-        >
-          Change Size window
-        </button>
-      </div>
-      <br />
       <div class="progress">
         <div
-          class="progress-bar"
+          class="progress-bar progress-bar-striped progress-bar-animated active"
           style="width: 0%;"
           role="progressbar"
           aria-valuenow="0"
@@ -122,16 +93,51 @@
           0%
         </div>
       </div>
-      <div>
-        <input type="text" value="0" disabled id="toshow" />
+      <div class="d-flex justify-content-around mt-3">
+        <button class="btn btn-primary" onclick="onPause()" id="pause" disabled>
+          Pause
+        </button>
+        <button
+          class="btn btn-success"
+          onclick="onContinue()"
+          id="continue"
+          disabled
+        >
+          Continue
+        </button>
       </div>
-      <div class="row">
+      <br />
+      <!-- <div>
+        <button
+          class="btn btn-danger"
+          type="button"
+          onclick="changeDefaultSize()"
+        >
+          Change Size window
+        </button>
+      </div> -->
+
+      <!-- <div class="row">
         <div class="col-sm">
           <button onclick="enable2Disable1()" disabled id="t1">Teste 1</button>
         </div>
         <div class="col-sm">
           <button onclick="enable1Disable2()" id="t2">Teste 2</button>
         </div>
+      </div> -->
+
+      <div class="d-flex justify-content-around mt-3 mb-2">
+        <button
+          class="btn btn-primary"
+          onclick="enable2Disable1()"
+          disabled
+          id="t1"
+        >
+          Teste 1
+        </button>
+        <button class="btn btn-primary" onclick="enable1Disable2()" id="t2">
+          Teste 2
+        </button>
       </div>
 
       <div class="row">

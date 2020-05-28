@@ -25,12 +25,13 @@ const btnTeste1 = document.getElementById("t1");
 const btnTeste2 = document.getElementById("t2");
 const userNameInpt = document.getElementById("userName");
 const passWordInpt = document.getElementById("passWord");
+const labelProgress = document.getElementById("label-progress");
 
 let mensage = "";
 let folderName = "";
 let folderPath = "";
 let idx = 0;
-let timeout = 3000;
+let timeout = 20000;
 let total = 0;
 let paused = false;
 
@@ -99,14 +100,13 @@ async function download() {
     //     }
     //   );
     // .catch(console.error);
-
-    // ipcRenderer.send("download-photos", {
-    //   name: folderName,
-    //   path: folderPath,
-    //   links: links.value,
-    //   index: 0,
-    // });
-    // console.log(links.value);
+    idx = 0;
+    ipcRenderer.send("download-photos", {
+      name: folderName,
+      path: folderPath,
+      links: links.value.split("\n"),
+      index: idx,
+    });
     console.log(links.value.split("\n"));
     console.log(folderName);
     console.log(folderPath);
@@ -165,7 +165,7 @@ function enable2Disable1() {
 }
 
 async function downloadImg(link, folderPath) {
-  await saver(link, folderPath).then(
+  return await saver(link, folderPath).then(
     (res) => {
       console.log(res.url);
       // inst.getMediaIdByUrl(res.url).then((res) => {
@@ -186,6 +186,7 @@ async function downloadImg(link, folderPath) {
 async function downloadPromise(list) {
   for (let i = idx; i < list.length; i++) {
     idx = i;
+    labelProgress.innerHTML = `${idx}/${total}`;
     if (!paused) {
       await new Promise((resolve, reject) => {
         setTimeout(async () => {

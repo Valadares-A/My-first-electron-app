@@ -123,4 +123,12 @@ ipcMain
     let width = data.width;
     let height = data.height;
     store.set("windowBounds", { width, height });
+  })
+  .on("download-photos", (event, data) => {
+    console.log("download event started");
+    
+    let aux = {};
+    let aux2 = store.get("pages") ? store.get("pages"): {};
+    aux[data.name] = data;
+    store.set("pages", { ...aux2, ...aux });
   });

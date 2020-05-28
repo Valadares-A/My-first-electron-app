@@ -112,14 +112,14 @@
       <div class="progress">
         <div
           class="progress-bar"
-          role="progressbar"
           style="width: 0%;"
+          role="progressbar"
           aria-valuenow="0"
           aria-valuemin="0"
           aria-valuemax="100"
           id="download-bar"
         >
-          25%
+          0%
         </div>
       </div>
       <div>
@@ -137,25 +137,24 @@
       <div class="row">
         <div class="col-sm">
           <label for="userName">User Name</label>
-          <input type="text" id="userName">
+          <input type="text" id="userName" />
         </div>
         <div class="col-sm">
           <label for="passWord">Password</label>
-          <input type="password" id="passWord">
+          <input type="password" id="passWord" />
         </div>
         <div class="col-sm">
-          <button class="btn btn-primary" onclick="logIn()" id="logIn">Login</button>
+          <button class="btn btn-primary" onclick="logIn()" id="logIn">
+            Login
+          </button>
         </div>
       </div>
-
-
     </div>
-    
-    <div id="toast-tester" class="toast" role="alert">
+    <!-- Toasts -->
+    <div id="toast-start" class="toast" role="alert" data-delay="10000">
       <div class="toast-header">
-        <img src="..." class="rounded mr-2" alt="..." />
-        <strong class="mr-auto">Bootstrap</strong>
-        <small>11 mins ago</small>
+        <strong class="mr-auto">Aviso!</strong>
+        <small>Just now</small>
         <button
           type="button"
           class="ml-2 mb-1 close"
@@ -166,7 +165,24 @@
         </button>
       </div>
       <div class="toast-body">
-        Hello, world! This is a toast message.
+        Download Iniciado!
+      </div>
+    </div>
+    <div id="toast-done" class="toast" role="alert" data-delay="10000">
+      <div class="toast-header">
+        <strong class="mr-auto">Aviso!</strong>
+        <small>Just now</small>
+        <button
+          type="button"
+          class="ml-2 mb-1 close"
+          data-dismiss="toast"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body">
+        Download Concluido!
       </div>
     </div>
     <!-- Scripts -->

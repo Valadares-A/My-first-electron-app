@@ -57,34 +57,19 @@ app.on("window-all-closed", () => {
 });
 
 app.on("ready", (event) => {
-  tray = new Tray("icon2.png");
-  const contextMenu = Menu.buildFromTemplate([
-    { label: "Item1", type: "radio" },
-    { label: "Item2", type: "radio" },
-    { label: "Item3", type: "radio", checked: true },
-    { label: "Item4", type: "radio" },
-  ]);
-  tray.setContextMenu(contextMenu);
-  contextMenu.items[1].checked = false;
-  tray.setToolTip("This is my application.");
-  tray.setContextMenu(contextMenu);
+  // tray = new Tray("icon2.png");
+  // const contextMenu = Menu.buildFromTemplate([
+  //   { label: "Item1", type: "radio" },
+  //   { label: "Item2", type: "radio" },
+  //   { label: "Item3", type: "radio", checked: true },
+  //   { label: "Item4", type: "radio" },
+  // ]);
+  // tray.setContextMenu(contextMenu);
+  // contextMenu.items[1].checked = false;
+  // tray.setToolTip("This is my application.");
+  // tray.setContextMenu(contextMenu);
   console.log("path: ", app.getAppPath());
   console.log(store.get("windowBounds"));
-
-  // inst
-  //   .getCsrfToken()
-  //   .then((csrf) => {
-  //     inst.csrfToken = csrf;
-  //   })
-  //   .then(() => {
-  //     inst.auth("eduardoyang147", "#huehueC4").then((sessionId) => {
-  //       console.log("sessionid:", sessionId);
-  //       inst.sessionId = sessionId;
-  //       console.log(idx);
-  //       downloadImg(auxstr[idx]);
-  //     });
-  //   })
-  //   .catch(console.error);
 });
 
 app.on("activate", () => {
@@ -138,22 +123,4 @@ ipcMain
     let width = data.width;
     let height = data.height;
     store.set("windowBounds", { width, height });
-  })
-  .on("download-photos", (event, data) => {
-    console.log("download event started");
-    
-    let aux = {};
-    let aux2 = store.get("pages") ? store.get("pages"): {};
-    aux[data.name] = data;
-    store.set("pages", { ...aux2, ...aux });
-  }).on("pause",(event, data)=>{
-    paused = true;
-    let aux = {};
-    let aux2 = store.get("pages") ? store.get("pages"): {};
-    aux[data.name] = data;
-    aux[data.name].index = idx;
-    store.set("pages", { ...aux2, ...aux });
-  }).on("continue",(event, data)=>{
-    paused = false;
-    // downloadImg(auxstr[idx], folder);
   });

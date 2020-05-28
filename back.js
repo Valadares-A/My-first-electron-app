@@ -18,6 +18,7 @@ const folder = document.getElementById("folder");
 const inputfolder = document.getElementById("iptFolder");
 const links = document.getElementById("links");
 const downloadBtn = document.getElementById("download");
+const progressBar = document.getElementById("download-bar");
 const pauseBtn = document.getElementById("pause");
 const continueBtn = document.getElementById("continue");
 const btnTeste1 = document.getElementById("t1");
@@ -28,9 +29,8 @@ const passWordInpt = document.getElementById("passWord");
 let mensage = "";
 let folderName = "";
 let folderPath = "";
-let auxstr = "";
 let idx = 0;
-let timeout = 5000;
+let timeout = 3000;
 let total = 0;
 let paused = false;
 
@@ -68,12 +68,8 @@ ipcRenderer
     }
   })
   .on("login", (event, data) => {
-    $(".toast").toast("show");
-  })
-  .on("update-percent", (event, data) => {
-    $("#download-bar").attr("aria-valuenow", `${data.percentage}`);
-    $("#download-bar").css("width", `${data.percentage}%`);
-    $("#toshow").attr("value", data.idx);
+    // $(".toast").toast("show");
+    $("#toast-done").toast("show");
   });
 
 function changeDefaultSize() {
@@ -114,11 +110,9 @@ async function download() {
     console.log(links.value.split("\n"));
     console.log(folderName);
     console.log(folderPath);
-    console.log("start promise");
-
+    total = links.value.split("\n").length - 1;
     downloadPromise(links.value.split("\n"));
-
-    // console.log("end of promise");
+    $("#toast-start").toast("show");
     downloadBtn.setAttribute("disabled", "true");
     pauseBtn.removeAttribute("disabled");
   } catch (error) {
@@ -137,6 +131,7 @@ function onPause() {
   continueBtn.removeAttribute("disabled");
   paused = true;
   console.log("clicquei em pausar");
+  progressBar.innerHTML = "Aguarde...";
 }
 
 function onContinue() {
@@ -150,6 +145,7 @@ function onContinue() {
   continueBtn.setAttribute("disabled", "true");
   paused = false;
   console.log("cliquei em continuar");
+  progressBar.innerHTML = "Retomando...";
   console.log("download retomado");
   downloadPromise(links.value.split("\n"));
 }
@@ -157,11 +153,15 @@ function onContinue() {
 function enable1Disable2() {
   btnTeste1.removeAttribute("disabled");
   btnTeste2.setAttribute("disabled", "true");
+  idx++;
+  updateProgressBar(idx, 100);
 }
 
 function enable2Disable1() {
   btnTeste1.setAttribute("disabled", "true");
   btnTeste2.removeAttribute("disabled");
+  idx++;
+  updateProgressBar(idx, 100);
 }
 
 async function downloadImg(link, folderPath) {
@@ -188,8 +188,8 @@ async function downloadPromise(list) {
     idx = i;
     if (!paused) {
       await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          let itsOk = downloadImg(list[i], folderPath);
+        setTimeout(async () => {
+          let itsOk = await downloadImg(list[i], folderPath);
           if (itsOk) {
             resolve({ status: "ok", link: list[i], index: i });
           } else {
@@ -199,16 +199,27 @@ async function downloadPromise(list) {
       }).then(
         (res) => {
           console.log(res);
+          updateProgressBar(idx, total);
         },
         (err) => {
           console.log(err);
+          updateProgressBar(idx, total);
         }
       );
     } else {
       console.log("download pausado");
-
+      progressBar.innerHTML = "Pausado...";
+      progressBar.classList.add("bg-warning");
       break;
     }
+  }
+
+  if (!paused) {
+    console.log("download concluido");
+    $("#toast-done").toast("show");
+    downloadBtn.removeAttribute("disabled");
+    pauseBtn.setAttribute("disabled", "true");
+    continueBtn.setAttribute("disabled", "true");
   }
 }
 
@@ -247,5 +258,22 @@ async function logIn() {
       .catch(console.error);
   } catch (error) {
     console.log(error);
+  }
+}
+
+function updateProgressBar(idx, total) {
+  if (progressBar.classList.contains("bg-success")) {
+    progressBar.classList.remove("bg-success");
+  }
+  if (progressBar.classList.contains("bg-warning")) {
+    progressBar.classList.remove("bg-warning");
+  }
+  let infos = calculatePercent(idx, total);
+  progressBar.setAttribute("aria-valuemax", total.toString());
+  progressBar.setAttribute("aria-valuenow", `${Math.round(infos.percentage)}`);
+  progressBar.style.width = `${Math.round(infos.percentage)}%`;
+  progressBar.innerHTML = `${Math.round(infos.percentage)}%`;
+  if (idx === total) {
+    progressBar.classList.add("bg-success");
   }
 }

@@ -105,3 +105,6 @@ dist
 
 #Credentials
 credentials.js
+
+#Distribution
+my-first-electron-app-linux-x64
